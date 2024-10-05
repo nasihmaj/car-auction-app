@@ -1,3 +1,5 @@
+// src/components/Navbar.js
+
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -7,12 +9,12 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
 const Navbar = () => {
-  const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate(); // Updated
+  const { user, logout } = useContext(AuthContext); // Get the user and logout from AuthContext
+  const navigate = useNavigate(); // For navigation on logout
 
   const handleLogout = () => {
     logout();
-    navigate('/login'); // Updated
+    navigate('/login'); // Redirect to login after logout
   };
 
   return (

@@ -10,6 +10,7 @@ const CarList = () => {
   useEffect(() => {
     api.get('/cars')
       .then((response) => {
+        
         setCars(response.data);
       })
       .catch((error) => {
