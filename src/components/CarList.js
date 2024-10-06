@@ -10,7 +10,6 @@ const CarList = () => {
   useEffect(() => {
     api.get('/cars')
       .then((response) => {
-        
         setCars(response.data);
       })
       .catch((error) => {
@@ -27,13 +26,15 @@ const CarList = () => {
         {cars.map((car) => (
           <Grid item key={car.id} xs={12} sm={6} md={4}>
             <Card>
+              {/* Display the car image if available */}
               {car.imageUrl && (
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={car.imageUrl}
-                  alt={`${car.make} ${car.model}`}
-                />
+     <CardMedia
+     component="img"
+     height="140"
+     image={`http://localhost:8080/images/${car.imageUrl}`} // Just use the filename stored in car.imageUrl
+     alt={`${car.make} ${car.model}`}
+   />
+   
               )}
               <CardContent>
                 <Typography gutterBottom variant="h5">
