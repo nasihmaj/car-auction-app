@@ -64,7 +64,7 @@ const Navbar = () => {
             display: { xs: 'none', md: 'flex' },
           }}
         >
-          Car Auction App
+          OPEN-LINK
         </Typography>
 
         {/* Mobile Menu Icon */}

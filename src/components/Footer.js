@@ -12,7 +12,7 @@ const Footer = () => (
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
           <Typography variant="h6" gutterBottom color="white">
-            Car Auction App
+            OPEN-LINK
           </Typography>
           <Typography variant="body2" color="grey.300">
             Buy and sell cars with ease. Our platform provides a seamless experience for car enthusiasts.
@@ -66,7 +66,7 @@ const Footer = () => (
       </Grid>
       <Box sx={{ textAlign: 'center', mt: 4 }}>
         <Typography variant="body2" color="grey.500">
-          © {new Date().getFullYear()} Car Auction App. All rights reserved.
+          © {new Date().getFullYear()} OPEN-LINK. All rights reserved.
         </Typography>
       </Box>
     </Container>

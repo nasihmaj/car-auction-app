@@ -1,5 +1,3 @@
-// src/components/CarForm.js
-
 import React, { useState } from 'react';
 import api from '../services/api'; // API service for making HTTP requests
 import { useNavigate } from 'react-router-dom'; // For navigation after form submission
@@ -236,20 +234,43 @@ const CarForm = () => {
           margin="normal"
         />
 
-        {/* Image Upload Field */}
-        <Button
-          variant="contained" // Sets the button variant
-          component="label" // Allows the button to act as a label for the hidden input
-          sx={{ mt: 2 }} // Adds top margin
+        {/* Button Section */}
+        <Box
+          sx={{
+            display: 'flex',         // Flexbox for alignment
+            justifyContent: 'space-between', // Aligns buttons
+            alignItems: 'center',     // Vertically centers buttons
+            mt: 4,                   // Top margin for spacing
+          }}
         >
-          Upload Image
-          <input
-            type="file" // Specifies the input type as file
-            hidden // Hides the default file input
-            onChange={handleFileChange} // Binds the handleFileChange function to input changes
-            accept="image/*" // Restricts file selection to images only
-          />
-        </Button>
+          {/* Image Upload Button */}
+          <Button
+            variant="contained"
+            component="label"
+          >
+            Upload Image
+            <input
+              type="file"
+              hidden
+              onChange={handleFileChange}
+              accept="image/*"
+            />
+          </Button>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{
+              width: '150px', // Makes the button wider
+              height: '50px', // Makes the button taller
+              ml: 2,          // Adds space between the buttons
+            }}
+          >
+            Submit
+          </Button>
+        </Box>
 
         {/* Display Selected File Name */}
         {carData.imageFile && (
@@ -257,16 +278,6 @@ const CarForm = () => {
             Selected file: {carData.imageFile.name}
           </Typography>
         )}
-
-        {/* Submit Button */}
-        <Button
-          type="submit" // Specifies the button type as submit
-          variant="contained"
-          color="primary" // Sets the button color
-          sx={{ mt: 3 }} // Adds top margin
-        >
-          Submit
-        </Button>
       </Box>
     </Container>
   );

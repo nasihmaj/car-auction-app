@@ -112,7 +112,7 @@ const Home = () => {
         </Grid>
       </Container>
 
-      {/* Call to Action Section */}
+      {/* Call to Action Section
       <Box
         sx={{
           backgroundColor: 'primary.main',
@@ -132,7 +132,7 @@ const Home = () => {
             Sign Up Now
           </Button>
         </Container>
-      </Box>
+      </Box> */}
     </>
   );
 };
