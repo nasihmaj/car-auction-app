@@ -7,6 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import CarRentalIcon from '@mui/icons-material/CarRental'; // Icon for the app
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext); // Get the user and logout from AuthContext
@@ -20,9 +21,19 @@ const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        {/* Icon and app name */}
+        <CarRentalIcon sx={{ mr: 1 }} />
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1 }}
+          component={Link}
+          to="/"
+          color="inherit"
+          style={{ textDecoration: 'none' }}
+        >
           Car Auction App
         </Typography>
+        {/* Navigation buttons */}
         <Button color="inherit" component={Link} to="/">
           Home
         </Button>

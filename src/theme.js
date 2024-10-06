@@ -1,17 +1,19 @@
 // src/theme.js
+
 import { createTheme } from '@mui/material/styles';
 
+// Create a custom theme
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2', // Customize your primary color
+      main: '#1976d2', // Primary color
     },
     secondary: {
-      main: '#dc004e',
+      main: '#dc004e', // Secondary color
     },
   },
   typography: {
-    // Customize typography settings here
+    fontFamily: 'Roboto, Arial', // Font family
   },
 });
 
