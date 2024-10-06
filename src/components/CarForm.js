@@ -1,7 +1,7 @@
 // src/components/CarForm.js
 
 import React, { useState } from 'react';
-import api from '../services/api'; // Import the API service
+import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -9,6 +9,7 @@ import {
   TextField,
   Button,
   Box,
+  MenuItem,
 } from '@mui/material';
 
 const CarForm = () => {
@@ -19,13 +20,14 @@ const CarForm = () => {
     mileage: '',
     price: '',
     description: '',
+    transmission: '',
+    fuelType: '',
     imageFile: null,
   });
 
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    // Update the state when form fields change
     setCarData({
       ...carData,
       [e.target.name]: e.target.value,
@@ -33,7 +35,6 @@ const CarForm = () => {
   };
 
   const handleFileChange = (e) => {
-    // Update the state when the image file changes
     setCarData({
       ...carData,
       imageFile: e.target.files[0],
@@ -43,16 +44,15 @@ const CarForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prepare form data to send to the backend
+    // Validate required fields
+    if (!carData.make || !carData.model || !carData.year || !carData.price) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('make', carData.make);
-    formData.append('model', carData.model);
-    formData.append('year', carData.year);
-    formData.append('mileage', carData.mileage);
-    formData.append('price', carData.price);
-    formData.append('description', carData.description);
-    if (carData.imageFile) {
-      formData.append('imageFile', carData.imageFile);
+    for (const key in carData) {
+      formData.append(key, carData[key]);
     }
 
     try {
@@ -61,7 +61,7 @@ const CarForm = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      navigate('/cars'); // Redirect to car list after successful submission
+      navigate('/cars');
     } catch (error) {
       console.error('Error adding car:', error);
     }
@@ -73,6 +73,7 @@ const CarForm = () => {
         List a Car
       </Typography>
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+        {/* Make and Model */}
         <TextField
           fullWidth
           required
@@ -91,6 +92,7 @@ const CarForm = () => {
           onChange={handleChange}
           margin="normal"
         />
+        {/* Year and Mileage */}
         <TextField
           fullWidth
           required
@@ -100,27 +102,67 @@ const CarForm = () => {
           onChange={handleChange}
           margin="normal"
           type="number"
+          inputProps={{ min: 1886, max: new Date().getFullYear() + 1 }}
         />
         <TextField
           fullWidth
           required
-          label="Mileage"
+          label="Mileage (km)"
           name="mileage"
           value={carData.mileage}
           onChange={handleChange}
           margin="normal"
           type="number"
+          inputProps={{ min: 0 }}
         />
+        {/* Price */}
         <TextField
           fullWidth
           required
-          label="Price"
+          label="Price ($)"
           name="price"
           value={carData.price}
           onChange={handleChange}
           margin="normal"
           type="number"
+          inputProps={{ min: 0 }}
         />
+        {/* Transmission */}
+        <TextField
+          fullWidth
+          select
+          label="Transmission"
+          name="transmission"
+          value={carData.transmission}
+          onChange={handleChange}
+          margin="normal"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value="Manual">Manual</MenuItem>
+          <MenuItem value="Automatic">Automatic</MenuItem>
+          <MenuItem value="Semi-Automatic">Semi-Automatic</MenuItem>
+        </TextField>
+        {/* Fuel Type */}
+        <TextField
+          fullWidth
+          select
+          label="Fuel Type"
+          name="fuelType"
+          value={carData.fuelType}
+          onChange={handleChange}
+          margin="normal"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value="Petrol">Petrol</MenuItem>
+          <MenuItem value="Diesel">Diesel</MenuItem>
+          <MenuItem value="Electric">Electric</MenuItem>
+          <MenuItem value="Hybrid">Hybrid</MenuItem>
+        </TextField>
+        {/* Description */}
         <TextField
           fullWidth
           multiline
@@ -131,6 +173,7 @@ const CarForm = () => {
           onChange={handleChange}
           margin="normal"
         />
+        {/* Image Upload */}
         <Button variant="contained" component="label" sx={{ mt: 2 }}>
           Upload Image
           <input type="file" hidden onChange={handleFileChange} />
@@ -140,6 +183,7 @@ const CarForm = () => {
             Selected file: {carData.imageFile.name}
           </Typography>
         )}
+        {/* Submit Button */}
         <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
           Submit
         </Button>

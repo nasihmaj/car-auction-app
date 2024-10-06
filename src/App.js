@@ -11,6 +11,9 @@ import CarList from './components/CarList';
 import CarForm from './components/CarForm';
 import PrivateRoute from './components/PrivateRoute';
 import CarDetails from './components/CarDetails';
+import Profile from './components/Profile';
+import Notifications from './components/Notifications';
+import Footer from './components/Footer'; // Import the Footer component
 
 function App() {
   return (
@@ -32,6 +35,7 @@ function App() {
           <Route path="/cars" element={<CarList />} />
           <Route path="/cars/:id" element={<CarDetails />} />
         </Routes>
+        <Footer /> {/* Add the Footer component */}
       </Router>
     </AuthProvider>
   );
