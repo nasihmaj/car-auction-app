@@ -1,3 +1,5 @@
+// src/components/CarForm.js
+
 import React, { useState } from 'react';
 import api from '../services/api'; // API service for making HTTP requests
 import { useNavigate } from 'react-router-dom'; // For navigation after form submission
@@ -21,16 +23,14 @@ const CarForm = () => {
     description: '',
     transmission: '',
     fuelType: '',
-    imageFile: null, // Holds the selected image file
+    color: '',
+    condition: '',
+    imageFiles: [], // Holds the selected image files (array)
   });
 
   const navigate = useNavigate(); // Hook to navigate programmatically
 
-  /**
-   * Handles changes in text fields.
-   * Updates the corresponding field in the state based on the input's name attribute.
-   * @param {Object} e - The event object from the input field.
-   */
+  // Handles changes in text fields
   const handleChange = (e) => {
     setCarData({
       ...carData,
@@ -38,53 +38,47 @@ const CarForm = () => {
     });
   };
 
-  /**
-   * Handles changes in the file input.
-   * Updates the imageFile field in the state with the selected file.
-   * @param {Object} e - The event object from the file input.
-   */
+  // Handles changes in the file input
   const handleFileChange = (e) => {
     setCarData({
       ...carData,
-      imageFile: e.target.files[0],
+      imageFiles: Array.from(e.target.files), // Convert FileList to Array
     });
   };
 
-  /**
-   * Handles form submission.
-   * Validates required fields and constructs FormData to send to the backend.
-   * If validation passes, sends a POST request to create a new car listing.
-   * @param {Object} e - The event object from the form submission.
-   */
+  // Handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents the default form submission behavior
 
-    // Validate required fields: make, model, year, price, and imageFile
+    // Validate required fields
     if (
       !carData.make ||
       !carData.model ||
       !carData.year ||
       !carData.price ||
-      !carData.imageFile
+      !carData.imageFiles ||
+      carData.imageFiles.length === 0
     ) {
-      alert('Please fill in all required fields and upload an image.');
+      alert('Please fill in all required fields and upload at least one image.');
       return; // Stops form submission if validation fails
     }
 
     // Create a new FormData object to hold the form data
     const formData = new FormData();
 
-    // Destructure to separate imageFile from the rest of the car data
-    const { imageFile, ...carDataCopy } = carData;
+    // Destructure to separate imageFiles from the rest of the car data
+    const { imageFiles, ...carDataCopy } = carData;
 
-    // Convert carDataCopy (excluding imageFile) to a JSON string
+    // Convert carDataCopy (excluding imageFiles) to a JSON string
     const carJson = JSON.stringify(carDataCopy);
 
     // Append the 'car' part as a JSON string
     formData.append('car', carJson);
 
-    // Append the 'image' part with the selected image file
-    formData.append('image', imageFile);
+    // Append each image file to the FormData object
+    imageFiles.forEach((file) => {
+      formData.append('images', file); // 'images' should match the backend parameter name
+    });
 
     try {
       // Send a POST request to the '/cars' endpoint with the form data
@@ -121,13 +115,13 @@ const CarForm = () => {
       >
         {/* Make Field */}
         <TextField
-          fullWidth // Makes the input take the full width of its container
-          required // Marks the field as required
-          label="Make" // Label for the input
-          name="make" // Name attribute used in handleChange
-          value={carData.make} // Binds the input value to the state
-          onChange={handleChange} // Binds the handleChange function to input changes
-          margin="normal" // Adds normal margin
+          fullWidth
+          required
+          label="Make"
+          name="make"
+          value={carData.make}
+          onChange={handleChange}
+          margin="normal"
         />
 
         {/* Model Field */}
@@ -150,10 +144,10 @@ const CarForm = () => {
           value={carData.year}
           onChange={handleChange}
           margin="normal"
-          type="number" // Specifies the input type as number
+          type="number"
           inputProps={{
-            min: 1886, // The year the first car was invented
-            max: new Date().getFullYear() + 1, // Allows next year's models
+            min: 1886,
+            max: new Date().getFullYear() + 1,
           }}
         />
 
@@ -167,7 +161,7 @@ const CarForm = () => {
           onChange={handleChange}
           margin="normal"
           type="number"
-          inputProps={{ min: 0 }} // Mileage cannot be negative
+          inputProps={{ min: 0 }}
         />
 
         {/* Price Field */}
@@ -180,20 +174,19 @@ const CarForm = () => {
           onChange={handleChange}
           margin="normal"
           type="number"
-          inputProps={{ min: 0 }} // Price cannot be negative
+          inputProps={{ min: 0 }}
         />
 
         {/* Transmission Field */}
         <TextField
           fullWidth
-          select // Makes the TextField a select dropdown
+          select
           label="Transmission"
           name="transmission"
           value={carData.transmission}
           onChange={handleChange}
           margin="normal"
         >
-          {/* Dropdown Options */}
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
@@ -212,7 +205,6 @@ const CarForm = () => {
           onChange={handleChange}
           margin="normal"
         >
-          {/* Dropdown Options */}
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
@@ -222,11 +214,31 @@ const CarForm = () => {
           <MenuItem value="Hybrid">Hybrid</MenuItem>
         </TextField>
 
+        {/* Color Field */}
+        <TextField
+          fullWidth
+          label="Color"
+          name="color"
+          value={carData.color}
+          onChange={handleChange}
+          margin="normal"
+        />
+
+        {/* Condition Field */}
+        <TextField
+          fullWidth
+          label="Condition"
+          name="condition"
+          value={carData.condition}
+          onChange={handleChange}
+          margin="normal"
+        />
+
         {/* Description Field */}
         <TextField
           fullWidth
-          multiline // Allows multiple lines of text
-          rows={4} // Sets the number of visible text lines
+          multiline
+          rows={4}
           label="Description"
           name="description"
           value={carData.description}
@@ -237,10 +249,10 @@ const CarForm = () => {
         {/* Button Section */}
         <Box
           sx={{
-            display: 'flex',         // Flexbox for alignment
-            justifyContent: 'space-between', // Aligns buttons
-            alignItems: 'center',     // Vertically centers buttons
-            mt: 4,                   // Top margin for spacing
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mt: 4,
           }}
         >
           {/* Image Upload Button */}
@@ -248,12 +260,13 @@ const CarForm = () => {
             variant="contained"
             component="label"
           >
-            Upload Image
+            Upload Images
             <input
               type="file"
               hidden
               onChange={handleFileChange}
               accept="image/*"
+              multiple
             />
           </Button>
 
@@ -263,20 +276,25 @@ const CarForm = () => {
             variant="contained"
             color="primary"
             sx={{
-              width: '150px', // Makes the button wider
-              height: '50px', // Makes the button taller
-              ml: 2,          // Adds space between the buttons
+              width: '150px',
+              height: '50px',
+              ml: 2,
             }}
           >
             Submit
           </Button>
         </Box>
 
-        {/* Display Selected File Name */}
-        {carData.imageFile && (
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            Selected file: {carData.imageFile.name}
-          </Typography>
+        {/* Display Selected File Names */}
+        {carData.imageFiles && carData.imageFiles.length > 0 && (
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="body2">Selected files:</Typography>
+            <ul>
+              {carData.imageFiles.map((file, index) => (
+                <li key={index}>{file.name}</li>
+              ))}
+            </ul>
+          </Box>
         )}
       </Box>
     </Container>

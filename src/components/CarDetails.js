@@ -58,8 +58,19 @@ const CarDetails = () => {
     borderRadius: '8px',
   });
 
-  // Images array (Assuming car.images is an array of image URLs)
-  const images = car.images && car.images.length > 0 ? car.images : [car.imageUrl];
+  // Prepare the images array
+  const images = [];
+
+  // Add images from imageUrls if available
+  if (car.imageUrls && car.imageUrls.length > 0) {
+    images.push(...car.imageUrls);
+  } else if (car.imageUrl) {
+    // For backward compatibility, add imageUrl if imageUrls is not available
+    images.push(car.imageUrl);
+  } else {
+    // If no images are available, use a placeholder image
+    images.push('placeholder.png');
+  }
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -71,13 +82,18 @@ const CarDetails = () => {
               {images.map((image, index) => (
                 <StyledImage
                   key={index}
-                  src={`http://localhost:8080/images/${image}`}
+                  src={
+                    image === 'placeholder.png'
+                      ? 'https://via.placeholder.com/600x400.png?text=No+Image'
+                      : `http://localhost:8080/images/${image}`
+                  }
                   alt={`${car.make} ${car.model}`}
                 />
               ))}
             </Carousel>
           </Paper>
         </Grid>
+
         {/* Details Section */}
         <Grid item xs={12} md={6}>
           <Typography variant="h4" gutterBottom>
@@ -89,6 +105,7 @@ const CarDetails = () => {
           <Typography variant="body1" gutterBottom>
             Mileage: {car.mileage.toLocaleString()} km
           </Typography>
+
           {/* Tabs for additional information */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 2 }}>
             <Tabs value={tabValue} onChange={handleTabChange}>
@@ -98,26 +115,33 @@ const CarDetails = () => {
             </Tabs>
           </Box>
           <Box sx={{ mt: 2 }}>
+            {/* Description Tab */}
             {tabValue === 0 && (
-              <Typography variant="body2">{car.description}</Typography>
+              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                {car.description}
+              </Typography>
             )}
+
+            {/* Specifications Tab */}
             {tabValue === 1 && (
               <>
-                {/* Adjusted fields based on your data */}
                 <Typography variant="body2">Transmission: {car.transmission}</Typography>
                 <Typography variant="body2">Fuel Type: {car.fuelType}</Typography>
                 <Typography variant="body2">Color: {car.color}</Typography>
                 <Typography variant="body2">Condition: {car.condition}</Typography>
               </>
             )}
+
+            {/* Seller Info Tab */}
             {tabValue === 2 && (
               <>
-                <Typography variant="body2">Seller: {car.sellerName}</Typography>
-                <Typography variant="body2">Contact: {car.sellerContact}</Typography>
-                <Typography variant="body2">Location: {car.location}</Typography>
+                <Typography variant="body2">Seller: {car.user.name}</Typography>
+                <Typography variant="body2">Contact: {car.user.email}</Typography>
+                {/* Add more seller info if available */}
               </>
             )}
           </Box>
+
           {/* Inquiry Form */}
           <Box component="form" onSubmit={handleInquirySubmit} sx={{ mt: 4 }}>
             <Typography variant="h6" gutterBottom>

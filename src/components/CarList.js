@@ -34,11 +34,11 @@ const CarList = () => {
   const carsPerPage = 9;
 
   useEffect(() => {
-    // Fetch the list of cars
+    // Fetch the list of cars from the backend API
     api.get('/cars')
       .then((response) => {
         setCars(response.data);
-        // Extract unique makes for the filter
+        // Extract unique makes for the filter dropdown
         const uniqueMakes = [...new Set(response.data.map((car) => car.make))];
         setMakes(uniqueMakes);
       })
@@ -47,7 +47,7 @@ const CarList = () => {
       });
   }, []);
 
-  // Filtered cars based on search and make filter
+  // Filter cars based on search query and make filter
   const filteredCars = cars.filter((car) => {
     return (
       (car.make.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,7 +56,7 @@ const CarList = () => {
     );
   });
 
-  // Sorting the cars
+  // Sort the filtered cars based on the selected sort option
   const sortedCars = [...filteredCars].sort((a, b) => {
     switch (sortOption) {
       case 'price_low_high':
@@ -72,7 +72,7 @@ const CarList = () => {
     }
   });
 
-  // Pagination
+  // Implement pagination
   const totalPages = Math.ceil(sortedCars.length / carsPerPage);
   const paginatedCars = sortedCars.slice((page - 1) * carsPerPage, page * carsPerPage);
 
@@ -88,6 +88,7 @@ const CarList = () => {
 
       {/* Search and Filter Section */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
+        {/* Search Field */}
         <Grid item xs={12} md={4}>
           <TextField
             fullWidth
@@ -96,7 +97,7 @@ const CarList = () => {
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
-              setPage(1); // Reset to first page
+              setPage(1); // Reset to first page when search query changes
             }}
             InputProps={{
               startAdornment: (
@@ -107,6 +108,8 @@ const CarList = () => {
             }}
           />
         </Grid>
+
+        {/* Make Filter Dropdown */}
         <Grid item xs={12} md={4}>
           <FormControl fullWidth variant="outlined">
             <InputLabel id="make-filter-label">Filter by Make</InputLabel>
@@ -115,7 +118,7 @@ const CarList = () => {
               value={makeFilter}
               onChange={(e) => {
                 setMakeFilter(e.target.value);
-                setPage(1); // Reset to first page
+                setPage(1); // Reset to first page when filter changes
               }}
               label="Filter by Make"
             >
@@ -130,6 +133,8 @@ const CarList = () => {
             </Select>
           </FormControl>
         </Grid>
+
+        {/* Sort Option Dropdown */}
         <Grid item xs={12} md={4}>
           <FormControl fullWidth variant="outlined">
             <InputLabel id="sort-label">Sort By</InputLabel>
@@ -162,7 +167,14 @@ const CarList = () => {
           <Grid item key={car.id} xs={12} sm={6} md={4}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               {/* Car Image */}
-              {car.imageUrl ? (
+              {car.imageUrls && car.imageUrls.length > 0 ? (
+                <CardMedia
+                  component="img"
+                  image={`http://localhost:8080/images/${car.imageUrls[0]}`}
+                  alt={`${car.make} ${car.model}`}
+                  sx={{ height: 200 }}
+                />
+              ) : car.imageUrl ? ( // For backward compatibility with existing data
                 <CardMedia
                   component="img"
                   image={`http://localhost:8080/images/${car.imageUrl}`}
@@ -177,6 +189,7 @@ const CarList = () => {
                   sx={{ height: 200 }}
                 />
               )}
+
               {/* Car Details */}
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5">
@@ -189,7 +202,8 @@ const CarList = () => {
                   ${car.price.toLocaleString()}
                 </Typography>
               </CardContent>
-              {/* Action Buttons */}
+
+              {/* Action Button */}
               <CardActions>
                 <Button
                   component={Link}
@@ -205,6 +219,7 @@ const CarList = () => {
             </Card>
           </Grid>
         ))}
+        {/* Message when no cars are found */}
         {paginatedCars.length === 0 && (
           <Typography variant="h6" sx={{ mt: 4 }}>
             No cars found matching your criteria.
