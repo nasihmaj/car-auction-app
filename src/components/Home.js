@@ -100,7 +100,8 @@ const Home = () => {
               Why Choose Us?
             </Typography>
             <Typography variant="body1" paragraph>
-              We offer a wide selection of vehicles from trusted sellers. Our platform ensures secure transactions and provides all the tools you need to make informed decisions.
+            We provide a seamless and secure platform where customers can list their cars effortlessly. Our extensive network of trusted dealers bids on your vehicle, ensuring a quick sale at the best price. 
+            With us, you benefit from secure transactions and all the tools you need to make informed decisions. Experience a fast, reliable, and efficient way to sell your car today.
             </Typography>
             <Button variant="contained" color="primary" component={Link} to="/cars">
               Explore Cars
