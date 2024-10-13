@@ -69,7 +69,7 @@ const CarDetails = () => {
     images.push(car.imageUrl);
   } else {
     // If no images are available, use a placeholder image
-    images.push('placeholder.png');
+    images.push('https://via.placeholder.com/600x400.png?text=No+Image');
   }
 
   return (
@@ -82,11 +82,7 @@ const CarDetails = () => {
               {images.map((image, index) => (
                 <StyledImage
                   key={index}
-                  src={
-                    image === 'placeholder.png'
-                      ? 'https://via.placeholder.com/600x400.png?text=No+Image'
-                      : `http://localhost:8080/images/${image}`
-                  }
+                  src={image}
                   alt={`${car.make} ${car.model}`}
                 />
               ))}

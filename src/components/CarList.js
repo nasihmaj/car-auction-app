@@ -170,14 +170,14 @@ const CarList = () => {
               {car.imageUrls && car.imageUrls.length > 0 ? (
                 <CardMedia
                   component="img"
-                  image={`http://localhost:8080/images/${car.imageUrls[0]}`}
+                  image={car.imageUrls[0]}
                   alt={`${car.make} ${car.model}`}
                   sx={{ height: 200 }}
                 />
               ) : car.imageUrl ? ( // For backward compatibility with existing data
                 <CardMedia
                   component="img"
-                  image={`http://localhost:8080/images/${car.imageUrl}`}
+                  image={car.imageUrl}
                   alt={`${car.make} ${car.model}`}
                   sx={{ height: 200 }}
                 />
