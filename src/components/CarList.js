@@ -1,7 +1,7 @@
 // src/components/CarList.js
 
 import React, { useEffect, useState } from 'react';
-import api from '../services/api'; // Import the API service
+import api from '../services/api';
 import { Link } from 'react-router-dom';
 import {
   Grid,
@@ -12,62 +12,198 @@ import {
   Button,
   Container,
   CardActions,
+  TextField,
+  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Pagination,
+  Box,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import SortIcon from '@mui/icons-material/Sort';
 
 const CarList = () => {
-  const [cars, setCars] = useState([]); // State to hold the list of cars
+  const [cars, setCars] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [makeFilter, setMakeFilter] = useState('');
+  const [makes, setMakes] = useState([]);
+  const [sortOption, setSortOption] = useState('');
+  const [page, setPage] = useState(1);
+  const carsPerPage = 9;
 
   useEffect(() => {
-    // Fetch the list of cars from the backend when the component mounts
+    // Fetch the list of cars from the backend API
     api.get('/cars')
       .then((response) => {
-        setCars(response.data); // Update the state with the fetched cars
+        setCars(response.data);
+        // Extract unique makes for the filter dropdown
+        const uniqueMakes = [...new Set(response.data.map((car) => car.make))];
+        setMakes(uniqueMakes);
       })
       .catch((error) => {
         console.error('Error fetching cars:', error);
       });
-  }, []); // Empty dependency array ensures this runs once when component mounts
+  }, []);
+
+  // Filter cars based on search query and make filter
+  const filteredCars = cars.filter((car) => {
+    return (
+      (car.make.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        car.model.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (makeFilter ? car.make === makeFilter : true)
+    );
+  });
+
+  // Sort the filtered cars based on the selected sort option
+  const sortedCars = [...filteredCars].sort((a, b) => {
+    switch (sortOption) {
+      case 'price_low_high':
+        return a.price - b.price;
+      case 'price_high_low':
+        return b.price - a.price;
+      case 'year_new_old':
+        return b.year - a.year;
+      case 'year_old_new':
+        return a.year - b.year;
+      default:
+        return 0;
+    }
+  });
+
+  // Implement pagination
+  const totalPages = Math.ceil(sortedCars.length / carsPerPage);
+  const paginatedCars = sortedCars.slice((page - 1) * carsPerPage, page * carsPerPage);
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
 
   return (
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         Available Cars
       </Typography>
+
+      {/* Search and Filter Section */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        {/* Search Field */}
+        <Grid item xs={12} md={4}>
+          <TextField
+            fullWidth
+            placeholder="Search by make or model"
+            variant="outlined"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1); // Reset to first page when search query changes
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+
+        {/* Make Filter Dropdown */}
+        <Grid item xs={12} md={4}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel id="make-filter-label">Filter by Make</InputLabel>
+            <Select
+              labelId="make-filter-label"
+              value={makeFilter}
+              onChange={(e) => {
+                setMakeFilter(e.target.value);
+                setPage(1); // Reset to first page when filter changes
+              }}
+              label="Filter by Make"
+            >
+              <MenuItem value="">
+                <em>All Makes</em>
+              </MenuItem>
+              {makes.map((make) => (
+                <MenuItem key={make} value={make}>
+                  {make}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* Sort Option Dropdown */}
+        <Grid item xs={12} md={4}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel id="sort-label">Sort By</InputLabel>
+            <Select
+              labelId="sort-label"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              label="Sort By"
+              startAdornment={
+                <InputAdornment position="start">
+                  <SortIcon />
+                </InputAdornment>
+              }
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value="price_low_high">Price: Low to High</MenuItem>
+              <MenuItem value="price_high_low">Price: High to Low</MenuItem>
+              <MenuItem value="year_new_old">Year: New to Old</MenuItem>
+              <MenuItem value="year_old_new">Year: Old to New</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+
+      {/* Car Cards */}
       <Grid container spacing={4}>
-        {cars.map((car) => (
+        {paginatedCars.map((car) => (
           <Grid item key={car.id} xs={12} sm={6} md={4}>
-            <Card>
-              {/* Display the car image if available; otherwise, show a placeholder image */}
-              {car.imageUrl ? (
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              {/* Car Image */}
+              {car.imageUrls && car.imageUrls.length > 0 ? (
                 <CardMedia
                   component="img"
-                  height="200"
-                  image={`http://localhost:8080/images/${car.imageUrl}`} // Adjust the URL as per your backend
+                  image={car.imageUrls[0]}
                   alt={`${car.make} ${car.model}`}
+                  sx={{ height: 200 }}
+                />
+              ) : car.imageUrl ? ( // For backward compatibility with existing data
+                <CardMedia
+                  component="img"
+                  image={car.imageUrl}
+                  alt={`${car.make} ${car.model}`}
+                  sx={{ height: 200 }}
                 />
               ) : (
-                // Placeholder image if no imageUrl
                 <CardMedia
                   component="img"
-                  height="200"
                   image="https://via.placeholder.com/300x200.png?text=No+Image"
                   alt="No Image Available"
+                  sx={{ height: 200 }}
                 />
               )}
-              <CardContent>
+
+              {/* Car Details */}
+              <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5">
                   {car.make} {car.model}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Year: {car.year}
+                  Year: {car.year} | Mileage: {car.mileage.toLocaleString()} km
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Mileage: {car.mileage} km
-                </Typography>
-                <Typography variant="h6" color="primary">
-                  Price: ${car.price}
+                <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
+                  ${car.price.toLocaleString()}
                 </Typography>
               </CardContent>
+
+              {/* Action Button */}
               <CardActions>
                 <Button
                   component={Link}
@@ -75,6 +211,7 @@ const CarList = () => {
                   variant="contained"
                   size="small"
                   color="primary"
+                  fullWidth
                 >
                   View Details
                 </Button>
@@ -82,7 +219,25 @@ const CarList = () => {
             </Card>
           </Grid>
         ))}
+        {/* Message when no cars are found */}
+        {paginatedCars.length === 0 && (
+          <Typography variant="h6" sx={{ mt: 4 }}>
+            No cars found matching your criteria.
+          </Typography>
+        )}
       </Grid>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
+      )}
     </Container>
   );
 };

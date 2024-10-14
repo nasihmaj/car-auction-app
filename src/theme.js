@@ -2,18 +2,29 @@
 
 import { createTheme } from '@mui/material/styles';
 
-// Create a custom theme
 const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: {
-      main: '#1976d2', // Primary color
+      main: '#2E7D32', // Slightly brighter dark green
     },
     secondary: {
-      main: '#dc004e', // Secondary color
+      main: '#FF8F00',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1E1E1E',
+    },
+    text: {
+      primary: '#FFFFFF',
+      secondary: '#B0BEC5',
     },
   },
   typography: {
-    fontFamily: 'Roboto, Arial', // Font family
+    // ... (same as before)
+  },
+  components: {
+    // ... (same as before)
   },
 });
 
