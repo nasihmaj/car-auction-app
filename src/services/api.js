@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://carauction20241014.loca.lt', // Your backend URL
+  baseURL: 'https://wicked-swan-11.loca.lt', // Your backend URL
 });
 
 api.interceptors.request.use(
